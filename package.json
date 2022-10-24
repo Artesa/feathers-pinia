@@ -1,6 +1,6 @@
 {
   "name": "@artesa/feathers-pinia",
-  "version": "1.0.0-pre.18",
+  "version": "2.0.0-pre.0",
   "files": [
     "dist",
     "src"
