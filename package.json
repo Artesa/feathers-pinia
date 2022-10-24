@@ -21,7 +21,6 @@
     "docs:copy-assets": "cp ./docs/feathers-pinia.png ./docs/.vitepress/dist/",
     "build": "vite build",
     "build:viz": "npx vite-bundle-visualizer",
-    "prepare": "npm run test && npm run build",
     "test": "vitest run",
     "coverage": "vitest run --coverage",
     "publish": "git push origin --tags && git push origin",
