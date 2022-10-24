@@ -161,6 +161,11 @@ export const useService = <C extends ModelConstructor = ModelConstructor, M = In
 
     const q = _.omit(params.query || {}, ..._paramsForServer)
 
+    // TODO: Add test for this:
+    if (q.$limit === -1) {
+      delete q.$limit
+    }
+
     const { query, filters } = filterQuery(q, {
       operators: _filterQueryOperators.value,
     })
