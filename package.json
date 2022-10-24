@@ -24,7 +24,7 @@
     "test": "vitest run",
     "coverage": "vitest run --coverage",
     "publish": "git push origin --tags && git push origin",
-    "release:pre": "npm run build && npm version prerelease && npm publish --tag pre",
+    "release:pre": "npm run build && npm version prerelease --preid pre && npm publish --tag pre",
     "release:patch": "npm run build && npm version patch && npm publish",
     "release:minor": "npm run build && npm version minor && npm publish",
     "release:major": "npm run build && npm version major && npm publish",
