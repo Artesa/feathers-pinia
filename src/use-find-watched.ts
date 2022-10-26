@@ -42,7 +42,7 @@ export function useFindWatched<
     request: null,
   })
 
-  const computes: UseFindComputed<M> = {
+  const computes: UseFindComputed<C> = {
     // The find getter
     items: makeUseFindItems(model.store || model, params),
     paginationData: computed(() => {
@@ -64,7 +64,6 @@ export function useFindWatched<
     if (typeof val === 'function') {
       const info = getQueryInfo(params, {})
       const qidData = model.store.pagination[info.qid]
-      // @ts-expect-error fix me ts(7053)
       const queryData = qidData?.[info.queryId]
       const pageData = queryData?.[info.pageId as string]
       const context = {
