@@ -106,10 +106,10 @@ export type ModelConstructor<M extends BaseModel = BaseModel> = NonConstructor<t
   new (...args: any[]): M
 }
 
-export interface UpdatePaginationForQueryOptions {
+export interface UpdatePaginationForQueryOptions<T = any> {
   qid: string
-  response: any
-  query: any
+  response: Paginated<T>
+  query: Query | undefined
   preserveSsr: boolean
 }
 

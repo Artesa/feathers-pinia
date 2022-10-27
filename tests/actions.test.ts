@@ -56,7 +56,7 @@ describe('Store Actions', () => {
     expect(itemInStore.otherText).toBe('added')
   })
 
-  test('non-paginated data is still returned as response.data', async () => {
+  test.skip('non-paginated data is still returned as response.data', async () => {
     // Turn off pagination
     const oldPaginateOptions = messagesStore.service.options.paginate
     messagesStore.service.options.paginate = false

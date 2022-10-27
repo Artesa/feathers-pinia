@@ -16,12 +16,12 @@ export const useServicePagination = (options: UseServicePagination) => {
    * Stores pagination data on state.pagination based on the query identifier
    * (qid) The qid must be manually assigned to `params.qid`
    */
-  function updatePaginationForQuery({
+  function updatePaginationForQuery<T = any>({
     qid,
     response,
     query = {},
     preserveSsr = false,
-  }: UpdatePaginationForQueryOptions) {
+  }: UpdatePaginationForQueryOptions<T>) {
     const { data, total } = response
     const _idField = idField.value
     const ids = data.map((i: any) => getId(i, _idField))

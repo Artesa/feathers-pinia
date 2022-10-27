@@ -211,7 +211,7 @@ export const useService = <C extends ModelConstructor = ModelConstructor, M = In
     }
   })
 
-  const countInStore = computed(() => (params: Params) => {
+  const countInStore = computed(() => (params: MaybeRef<Params>) => {
     params = { ...unref(params) }
 
     if (!params.query) {
@@ -223,13 +223,13 @@ export const useService = <C extends ModelConstructor = ModelConstructor, M = In
     return findInStore.value(params).total
   })
 
-  const getFromStore = computed(() => (id: Id | null, params?: Params): M | null => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const getFromStore = computed(() => (id: MaybeRef<Id | null>, params?: MaybeRef<Params>): M | null => {
     id = unref(id)
-    params = fastCopy(unref(params) || {})
 
     let item = null
-    const existingItem = itemsById.value[id as Id] && select(params, idField.value)(itemsById.value[id as Id])
-    const tempItem = tempsById.value[id as Id] && select(params, tempIdField.value)(tempsById.value[id as Id])
+    const existingItem = itemsById.value[id as Id]
+    const tempItem = tempsById.value[id as Id]
 
     if (existingItem) item = existingItem
     else if (tempItem) item = tempItem
@@ -325,21 +325,26 @@ export const useService = <C extends ModelConstructor = ModelConstructor, M = In
     const id = idField.value
     const { qid = 'default', query, preserveSsr = false } = params
     // Normalize response so data is always found at response.data
-    const paginated = Array.isArray(response) ? { data: response } : response
 
-    addOrUpdate(paginated.data)
+    const isArray = Array.isArray(response)
+
+    const data = isArray ? response : response.data
+
+    addOrUpdate(data)
 
     // The pagination data will be under `pagination.default` or whatever qid is passed.
-    paginated.data && updatePaginationForQuery({ qid, response: paginated, query, preserveSsr })
-
-    // Swap out the response records for their Vue-observable store versions
-    const data = paginated.data
-    const mappedFromState = data.map((item) => itemsById.value[getId(item, id) as Id])
-    if (mappedFromState[0] !== undefined) {
-      paginated.data = paginated.data = mappedFromState
+    if (!isArray) {
+      updatePaginationForQuery({ qid, response, query, preserveSsr })
     }
 
-    return paginated
+    // Swap out the response records for their Vue-observable store versions
+    data.forEach((item, i) => {
+      item = itemsById.value[getId(item as any, id) as Id] ?? item
+
+      data[i] = item
+    })
+
+    return response
   }
 
   async function count(_params?: MaybeRef<Params>) {
@@ -361,9 +366,6 @@ export const useService = <C extends ModelConstructor = ModelConstructor, M = In
     }
   }
 
-  // Supports passing params the feathers way: `get(id, params)`
-  // Does NOT support the old array syntax:
-  // `get([null, params])` which was only needed for Vuex
   async function get(id: Id, _params?: MaybeRef<Params>) {
     const params = getSaveParams(_params)
 
