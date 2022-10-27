@@ -1,8 +1,6 @@
 export { associateFind } from './associate-find'
 export { associateGet } from './associate-get'
 
-// export { models } from './models'
-// export { clients, registerClient } from './clients'
 export { OhMyFetch } from './feathers-ohmyfetch'
 
 export { Find, useFind } from './use-find'
@@ -20,3 +18,5 @@ export { useAuth } from './use-auth'
 
 export * from './types'
 export * from './service'
+
+export { getQueryInfo } from './utils'
