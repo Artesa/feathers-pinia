@@ -137,6 +137,26 @@ export const useService = <C extends ModelConstructor = ModelConstructor, M = In
     tempIdField,
   })
 
+  const itemsAndTemps = computed(() => {
+    return items.value.concat(temps.value)
+  })
+
+  const itemsWithClones = computed(() => {
+    return items.value.map((item) => {
+      const id = item[idField.value] as Id
+      const clone = clonesById.value[id]
+      return clone || item
+    })
+  })
+
+  const itemsAndTempsWithClones = computed(() => {
+    return itemsAndTemps.value.map((item) => {
+      const id = item[idField.value] as Id
+      const clone = clonesById.value[id]
+      return clone || item
+    })
+  })
+
   const whitelist = ref(options.whitelist ?? [])
   const paramsForServer = ref(options.paramsForServer ?? [])
   const skipRequestIfExists = ref(options.skipRequestIfExists ?? false)
@@ -169,10 +189,16 @@ export const useService = <C extends ModelConstructor = ModelConstructor, M = In
     const { query, filters } = filterQuery(q, {
       operators: _filterQueryOperators.value,
     })
-    let values = items.value
 
-    if (params.temps) {
-      values.push(...temps.value)
+    let values: M[];
+    if (!params.temps && !params.copies) {
+      values = items.value
+    } else if (params.temps && !params.copies) {
+      values = itemsAndTemps.value
+    } else if (!params.temps && params.copies) {
+      values = itemsWithClones.value
+    } else {
+      values = itemsAndTempsWithClones.value
     }
 
     values = values.filter(sift(query, { operations }))
