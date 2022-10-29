@@ -13,8 +13,8 @@ export class BaseModel implements AnyData {
 
   public __isClone = false
 
-  static instanceDefaults<C extends ModelConstructor>(this: C, data: AnyData): AnyData {
-    return data
+  static instanceDefaults<C extends ModelConstructor>(this: C, data?: AnyData): AnyData {
+    return data || {}
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -39,7 +39,7 @@ export class BaseModel implements AnyData {
    * This allows default values to be specified directly in the Class's interface.
    * @param data
    */
-  public init(data: AnyData) {
+  public init(data?: AnyData) {
     const Model = this.getModel()
 
     // If you call these here, you can use default values in the Model interface.
