@@ -5,7 +5,12 @@ import { resetStores } from './test-utils'
 
 const pinia = createPinia()
 
-class Message extends BaseModel {}
+class Message extends BaseModel {
+  constructor(data: Partial<Message>) {
+    super()
+    this.init(data)
+  }
+}
 const useMessagesService = defineServiceStore('messages', () =>
   useService({ servicePath: 'messages', idField: 'id', Model: Message, app: api }),
 )

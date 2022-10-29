@@ -18,6 +18,11 @@ describe('server side rendering', () => {
 
     class Message extends BaseModel {
       static modelName = 'Message'
+
+      constructor(data: Partial<Message>) {
+        super()
+        this.init(data)
+      }
     }
 
     const servicePath = 'messages'
@@ -70,6 +75,11 @@ describe('server side rendering', () => {
 
     class Message extends BaseModel {
       static modelName = 'Message'
+
+      constructor(data: Partial<Message>) {
+        super()
+        this.init(data)
+      }
     }
 
     const servicePath = 'messages'

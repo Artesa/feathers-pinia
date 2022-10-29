@@ -11,8 +11,8 @@ export class Message extends BaseModel {
   id: number
   text: string
 
-  constructor(data: Partial<Message>, options: Record<string, any> = {}) {
-    super(data, options)
+  constructor(data: Partial<Message>) {
+    super()
     this.init(data)
   }
 }

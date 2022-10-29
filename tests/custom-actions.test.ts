@@ -10,7 +10,13 @@ describe('Custom Actions', () => {
   test('adds custom actions to the store', async () => {
     const pinia = createPinia()
     const test = vi.fn()
-    class Message extends BaseModel {}
+    class Message extends BaseModel {
+      constructor(data: Partial<Message>) {
+        super()
+        this.init(data)
+      }
+    }
+
     const useMessagesService = defineServiceStore('messages', () => {
       const serviceStore = useService({
         servicePath: 'messages',
@@ -32,15 +38,27 @@ describe('Custom Actions', () => {
 
   test('supports useFind as a customAction', async () => {
     const pinia = createPinia()
-    const useMessagesService: any = defineServiceStore('messages', () => {
+
+    class Message extends BaseModel {
+      id: number
+      _idTemp: string
+      text: string
+
+      constructor(data: Partial<Message>) {
+        super()
+        this.init(data)
+      }
+    }
+
+    const useMessagesService = defineServiceStore('messages', () => {
       const serviceStore = useService({
         servicePath: 'messages',
-        Model: BaseModel,
+        Model: Message,
         app: api,
       })
 
       function findMessages(params: any) {
-        return useFindWatched({ params, model: BaseModel })
+        return useFindWatched({ params, model: Message })
       }
 
       return {

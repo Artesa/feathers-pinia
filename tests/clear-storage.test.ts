@@ -7,7 +7,12 @@ import { vi } from 'vitest'
 
 const pinia = createPinia()
 
-class Message extends BaseModel {}
+class Message extends BaseModel {
+  constructor(data: Partial<Message>) {
+    super()
+    this.init(data)
+  }
+}
 const useMessagesService = defineServiceStore('messages', () =>
   useService({ servicePath: 'messages', Model: Message, app: api }),
 )

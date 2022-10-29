@@ -6,6 +6,11 @@ const pinia = createPinia()
 
 class Message extends BaseModel {
   text!: string
+
+  constructor(data: Partial<Message>) {
+    super()
+    this.init(data)
+  }
 }
 const useMessagesService = defineServiceStore('messages', () =>
   useService({ servicePath: 'messages', Model: Message, app: api }),
@@ -15,6 +20,11 @@ const messagesService = useMessagesService(pinia)
 class User extends BaseModel {
   id: number | string | undefined
   name!: string
+  constructor(data: Partial<User>) {
+    super()
+    this.init(data)
+  }
+
   instanceDefaults() {
     return {
       id: undefined,

@@ -9,6 +9,11 @@ const pinia = createPinia()
 
 class Message extends BaseModel {
   static modelName = 'Message'
+
+  constructor(data: Partial<Message>) {
+    super()
+    this.init(data)
+  }
 }
 
 const servicePath = 'messages'

@@ -7,6 +7,11 @@ const pinia = createPinia()
 
 class Message extends BaseModel {
   otherText?: string
+
+  constructor(data: Message) {
+    super()
+    this.init(data)
+  }
 }
 const servicePath = 'messages'
 

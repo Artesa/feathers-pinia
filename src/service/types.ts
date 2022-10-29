@@ -113,17 +113,6 @@ export interface UpdatePaginationForQueryOptions<T = any> {
   preserveSsr: boolean
 }
 
-export interface ModelInstanceOptions {
-  /**
-   * is creating clone
-   */
-  clone?: boolean
-}
-
-export interface BaseModelModifierOptions {
-  store: any
-}
-
 export interface CloneOptions {
   useExisting?: boolean
 }

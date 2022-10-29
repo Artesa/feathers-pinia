@@ -10,6 +10,11 @@ export class User extends BaseModel {
   name: string
 
   messages?: Partial<Message>[]
+
+  constructor(data: Partial<User>) {
+    super()
+    this.init(data)
+  }
 }
 
 /**
@@ -29,21 +34,17 @@ export class Message extends BaseModel {
   user2?: Partial<User> = { name: 'Larry' }
 
   // The constructor takes the place of `setupInstance`.
-  constructor(data: Partial<Message> = {}, options: Record<string, any> = {}) {
-    super(data, options)
+  constructor(data: Partial<Message> = {}) {
+    super()
     this.init(data)
-
-    // access to `store` and `models`
-    const { models } = this.getModel()
-    const store = this.getStore()
 
     this.user2 = { name: 'Marshall' }
   }
 
   // You can still use, `setupInstance` if you prefer.
-  static setupInstance(message: Partial<Message>) {
-    // access to `store` and `models` is from `this`.
-    const { store, models } = this
+  static setupInstance(message: Message) {
+    // access to `store` and is from `this`.
+    const { store } = this
   }
 }
 

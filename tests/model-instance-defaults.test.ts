@@ -1,5 +1,5 @@
 import { createPinia } from 'pinia'
-import { BaseModel, useService, defineServiceStore } from '../src'
+import { BaseModel, useService, defineServiceStore, AnyData } from '../src'
 import { api } from './feathers'
 
 const pinia = createPinia()
@@ -7,12 +7,17 @@ const pinia = createPinia()
 class Message extends BaseModel {
   // This doesn't work as a default value.
   // It will overwrite all passed-in values and always be this value.
-  text = 'The text in the model always wins. You can only overwrite it after instantiation'
-  // otherText: string
+  text = 'This gets overwritten by the instanceDefaults'
+  otherText: string
 
-  static instanceDefaults() {
+  constructor(data: Partial<Message>) {
+    super()
+    this.init(data)
+  }
+
+  static instanceDefaults(): Partial<Message> {
     return {
-      text: 'this gets overwritten by the class-level `text`',
+      text: 'this overwrites the model default',
       otherText: `this won't get overwritten and works great for a default value`,
     }
   }
@@ -31,15 +36,17 @@ describe('Model Instance Defaults', () => {
   beforeAll(() => resetStore())
   afterAll(() => resetStore())
 
-  test('class-level defaults do not work because they overwrite provided data', async () => {
+  test('provided data overwrites defaults', async () => {
     const message = await messagesService.create({
-      text: 'this text will be overwritten by the value in the Message class.',
+      text: 'This overwrites anything',
     })
-    expect(message.text).toBe('The text in the model always wins. You can only overwrite it after instantiation')
+    expect(message.text).toBe('This overwrites anything')
+    expect(message.otherText).toBe("this won't get overwritten and works great for a default value")
   })
 
   test('use instanceDefaults for default values', async () => {
     const message = await messagesService.create({})
-    expect(message.otherText).toBe(`this won't get overwritten and works great for a default value`)
+    expect(message.text).toBe(`this overwrites the model default`)
+    expect(message.otherText).toBe("this won't get overwritten and works great for a default value")
   })
 })

@@ -1,13 +1,6 @@
 import { getId, getTempId, getAnyId, diff, pickDiff } from '../utils'
 import fastCopy from 'fast-copy'
-import {
-  AnyData,
-  ModelInstanceOptions,
-  ModelConstructor,
-  BaseModelModifierOptions,
-  BaseModelAssociations,
-  CloneOptions,
-} from './types'
+import { AnyData, ModelConstructor, BaseModelAssociations, CloneOptions } from './types'
 import { Id, Params } from '@feathersjs/feathers'
 
 export class BaseModel implements AnyData {
@@ -18,26 +11,15 @@ export class BaseModel implements AnyData {
   static tempIdField = ''
   static associations: BaseModelAssociations = {}
 
-  public __isClone!: boolean
+  public __isClone = false
 
-  constructor(data: Record<string, any> = {}, options: ModelInstanceOptions = {}) {
-    const c = this.getModel()
-    Object.assign(this, c.instanceDefaults.call(c, data, { store: c.store }))
-
-    Object.defineProperty(this, '__isClone', {
-      value: !!options.clone,
-    })
-
-    return this
-  }
-
-  public static instanceDefaults<C extends ModelConstructor>(
-    this: C,
-    data: AnyData,
-    options?: BaseModelModifierOptions,
-  ): AnyData
   static instanceDefaults<C extends ModelConstructor>(this: C, data: AnyData): AnyData {
     return data
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  static setupInstance<C extends ModelConstructor, M extends InstanceType<C> = InstanceType<C>>(this: C, instance: M) {
+    return
   }
 
   getModel<M extends BaseModel>(this: M) {
@@ -57,13 +39,12 @@ export class BaseModel implements AnyData {
    * This allows default values to be specified directly in the Class's interface.
    * @param data
    */
-  public init(data: Record<string, any>) {
-    // @ts-expect-error setupInstance is not defined
-    const { instanceDefaults, setupInstance } = this.getModel()
+  public init(data: AnyData) {
+    const Model = this.getModel()
 
     // If you call these here, you can use default values in the Model interface.
-    if (instanceDefaults) Object.assign(this, instanceDefaults.call(this.getModel(), data), data)
-    if (setupInstance) setupInstance.call(this.getModel(), this)
+    Object.assign(this, Model.instanceDefaults(data), data)
+    Model.setupInstance(this)
   }
 
   public getId() {

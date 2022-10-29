@@ -5,7 +5,12 @@ import { ref, computed } from 'vue-demi'
 
 const pinia = createPinia()
 
-class User extends BaseModel {}
+class User extends BaseModel {
+  constructor(data: Partial<User>) {
+    super()
+    this.init(data)
+  }
+}
 
 const makeStore = ({ servicePath }) => {
   const store = useService({

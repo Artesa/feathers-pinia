@@ -98,9 +98,9 @@ export function assignTempId(item: AnyData, tempIdField: string) {
  * @param data item or array of items
  * @returns items without private attributes like __isClone and __tempId
  */
-export function cleanData<T = AnyDataOrArray>(data: T, tempIdField: string): T {
+export function cleanData<T = AnyDataOrArray>(data: T, ...fields: string[]): T {
   const { items, isArray } = getArray(data)
-  const cleaned = items.map((item) => _.omit(item, tempIdField))
+  const cleaned = items.map((item) => _.omit(item, ...fields))
 
   return isArray ? cleaned : cleaned[0]
 }

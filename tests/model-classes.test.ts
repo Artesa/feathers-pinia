@@ -4,7 +4,12 @@ import { api } from './feathers'
 
 const pinia = createPinia()
 
-class Message extends BaseModel {}
+class Message extends BaseModel {
+  constructor(data: Partial<Message>) {
+    super()
+    this.init(data)
+  }
+}
 
 const servicePath = 'messages'
 const useMessagesService = defineServiceStore('messages', () => useService({ servicePath, Model: Message, app: api }))

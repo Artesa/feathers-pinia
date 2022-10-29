@@ -5,13 +5,26 @@ import { resetStores } from './test-utils'
 
 const pinia = createPinia()
 
-class AltId extends BaseModel {}
+class AltId extends BaseModel {
+  _id: number
+
+  constructor(data: Partial<AltId>) {
+    super()
+    this.init(data)
+  }
+}
 const useAltIds = defineServiceStore('alt-ids', () =>
   useService({ servicePath: 'alt-ids', Model: AltId, idField: '_id', app: api }),
 )
 const altIdStore = useAltIds(pinia)
 
-class CustomId extends BaseModel {}
+class CustomId extends BaseModel {
+  'my-id': number
+  constructor(data: Partial<CustomId>) {
+    super()
+    this.init(data)
+  }
+}
 const useCustomIds = defineServiceStore('custom-ids', () =>
   useService({ servicePath: 'custom-ids', Model: CustomId, idField: 'my-id', app: api }),
 )

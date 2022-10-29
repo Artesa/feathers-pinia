@@ -7,8 +7,7 @@ import type { Id } from '@feathersjs/feathers'
 import sift from 'sift'
 import { operations } from '../utils-custom-operators'
 import { _ } from '@feathersjs/commons'
-import { filterQuery, sorter, select } from '@feathersjs/adapter-commons'
-import fastCopy from 'fast-copy'
+import { filterQuery, sorter } from '@feathersjs/adapter-commons'
 import {
   getId,
   getTempId,
@@ -51,7 +50,6 @@ export type UseFeathersServiceOptions<C extends ModelConstructor = ModelConstruc
   Model?: C
   idField?: string
   tempIdField?: string
-  clientAlias?: string
   servicePath: string
   whitelist?: string[]
   paramsForServer?: string[]
@@ -62,18 +60,22 @@ export type UseFeathersServiceOptions<C extends ModelConstructor = ModelConstruc
   debounceEventsGuarantee?: boolean
 }
 
-const defaultSharedState = {
-  clientAlias: 'api',
-  skipRequestIfExists: false,
-}
-
 const FILTERS = ['$sort', '$limit', '$skip', '$select']
 const additionalOperators = ['$elemMatch']
 
-export const useService = <C extends ModelConstructor = ModelConstructor, M = InstanceType<C>>(
+export const useService = <C extends ModelConstructor = ModelConstructor, M extends InstanceType<C> = InstanceType<C>>(
   _options: UseFeathersServiceOptions<C, M>,
 ) => {
-  const options = Object.assign({}, defaultSharedState, _options)
+  const defaultOptions = {
+    skipRequestIfExists: false,
+    idField: defaultIdField(),
+    tempIdField: defaultTempIdField(),
+    whitelist: [] as string[],
+    paramsForServer: [] as string[],
+    ssr: false,
+  }
+
+  const options = Object.assign(defaultOptions, _options)
 
   let _Model: C
 
@@ -83,6 +85,11 @@ export const useService = <C extends ModelConstructor = ModelConstructor, M = In
     _Model = class DynamicBaseModel extends BaseModel {
       static dynamicBaseModel = true
       static modelName = _options.servicePath
+
+      constructor(data: AnyData) {
+        super()
+        this.init(data)
+      }
     }
   } else {
     _Model = _options.Model
@@ -97,7 +104,7 @@ export const useService = <C extends ModelConstructor = ModelConstructor, M = In
     return options.app.service(servicePath.value)
   })
 
-  const idField = ref(options.idField || defaultIdField())
+  const idField = ref(options.idField)
   const itemsById = ref({}) as Ref<Record<string | number | symbol, M>>
 
   const items = computed(() => {
@@ -108,7 +115,7 @@ export const useService = <C extends ModelConstructor = ModelConstructor, M = In
     return items.value.map((item) => item[idField.value] as Id)
   })
 
-  const tempIdField = ref(options.tempIdField || defaultTempIdField())
+  const tempIdField = ref(options.tempIdField)
   const tempsById = ref({}) as Ref<Record<string | number | symbol, M>>
 
   const temps = computed(() => {
@@ -129,7 +136,7 @@ export const useService = <C extends ModelConstructor = ModelConstructor, M = In
     return _Model
   })
 
-  const { clone, cloneIds, clones, clonesById, commit, reset } = useServiceClones({
+  const { clone, cloneIds, clones, clonesById, commit, reset } = useServiceClones<C, M>({
     Model,
     itemsById,
     tempsById,
@@ -157,9 +164,9 @@ export const useService = <C extends ModelConstructor = ModelConstructor, M = In
     })
   })
 
-  const whitelist = ref(options.whitelist ?? [])
-  const paramsForServer = ref(options.paramsForServer ?? [])
-  const skipRequestIfExists = ref(options.skipRequestIfExists ?? false)
+  const whitelist = ref(options.whitelist)
+  const paramsForServer = ref(options.paramsForServer)
+  const skipRequestIfExists = ref(options.skipRequestIfExists)
 
   const isSsr = computed(() => {
     const ssr = unref(options.ssr)
@@ -190,7 +197,7 @@ export const useService = <C extends ModelConstructor = ModelConstructor, M = In
       operators: _filterQueryOperators.value,
     })
 
-    let values: M[];
+    let values: M[]
     if (!params.temps && !params.copies) {
       values = items.value
     } else if (params.temps && !params.copies) {
@@ -432,7 +439,7 @@ export const useService = <C extends ModelConstructor = ModelConstructor, M = In
     _setPending('create', true)
 
     try {
-      const response = await service.value.create(cleanData(data, _tempIdField), params)
+      const response = await service.value.create(cleanData(data, _tempIdField, '__isClone'), params)
       const restoredTempIds = restoreTempIds(data, response, _tempIdField)
       return addOrUpdate(restoredTempIds)
     } catch (error) {
@@ -452,7 +459,7 @@ export const useService = <C extends ModelConstructor = ModelConstructor, M = In
     _setPending('update', true)
 
     try {
-      const response = await service.value.update(id, cleanData(data, Model.value.tempIdField), params)
+      const response = await service.value.update(id, cleanData(data, Model.value.tempIdField, '__isClone'), params)
       return addOrUpdate(response)
     } catch (error) {
       return await Promise.reject(error)
@@ -475,7 +482,7 @@ export const useService = <C extends ModelConstructor = ModelConstructor, M = In
     _setPending('patch', true)
 
     try {
-      const response = await service.value.patch(id, cleanData(data, Model.value.tempIdField), params)
+      const response = await service.value.patch(id, cleanData(data, Model.value.tempIdField, '__isClone'), params)
       return addOrUpdate(response)
     } catch (error) {
       return await Promise.reject(error)

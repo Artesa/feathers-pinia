@@ -8,6 +8,11 @@ class Message extends BaseModel {
   foo: any
   additionalData: any
 
+  constructor(data: Partial<Message>) {
+    super()
+    this.init(data)
+  }
+
   get baz() {
     return 'baz'
   }
@@ -43,7 +48,7 @@ describe('Clone & Commit', () => {
 
     expect(committed.foo).toBe('bar')
     expect(committed.baz).toBe('baz')
-    expect(committed.__isClone).toBeUndefined()
+    expect(committed.__isClone).toBe(false)
   })
 
   test('resetting an original gives you a clone', async () => {

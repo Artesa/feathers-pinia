@@ -10,8 +10,8 @@ class Message extends BaseModel {
   text = ''
   other?: string
 
-  constructor(data: Partial<Message>, options: Record<string, any> = {}) {
-    super(data, options)
+  constructor(data: Partial<Message>) {
+    super()
     this.init(data)
   }
 }
