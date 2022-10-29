@@ -18,7 +18,7 @@ export class BaseModel implements AnyData {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  static setupInstance<C extends ModelConstructor, M extends InstanceType<C> = InstanceType<C>>(this: C, instance: M) {
+  static setupInstance<C extends ModelConstructor>(this: C, instance: AnyData) {
     return
   }
 
