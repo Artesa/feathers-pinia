@@ -1,13 +1,7 @@
 import { ref, computed, Ref, del, set } from 'vue-demi'
-import { copyAssociations, getAnyId, getTempId, hasOwn } from '../utils'
+import { copyAssociations, getAnyId, getTempId, hasOwn, markAsClone } from '../utils'
 import { CloneOptions, ModelConstructor } from './types'
 import fastCopy from 'fast-copy'
-import { BaseModel } from './base-model'
-
-export function markAsClone<T extends BaseModel>(item: T) {
-  item.__isClone = true
-  return item
-}
 
 export type UseServiceClonesOptions<C extends ModelConstructor = ModelConstructor, M = InstanceType<C>> = {
   idField: Ref<string>
@@ -49,7 +43,7 @@ export const useServiceClones = <
     } else {
       // Create the clone with any applicable associations
       const clone = fastCopy(originalItem)
-      markAsClone(clone)
+      markAsClone(clone, true)
       copyAssociations(originalItem, clone, clone.getModel().associations)
 
       // Copy over any provided data
@@ -95,7 +89,7 @@ export const useServiceClones = <
         del(cloneReset as any, key)
       }
     })
-    markAsClone(cloneReset)
+    markAsClone(cloneReset, true)
     return cloneReset
   }
 

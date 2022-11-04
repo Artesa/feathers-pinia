@@ -105,6 +105,14 @@ export function cleanData<T = AnyDataOrArray>(data: T, ...fields: string[]): T {
   return isArray ? cleaned : cleaned[0]
 }
 
+export function markAsClone<T extends Record<string, any>>(item: T, value: boolean) {
+  Object.defineProperty(item, '__isClone', {
+    value,
+    enumerable: false,
+  })
+  return item
+}
+
 /**
  * Restores tempIds to the records returned from the server. The tempIds need to be
  * temporarily put back in place in order to migrate the objects from the tempsById

@@ -1,4 +1,4 @@
-import { getId, getTempId, getAnyId, diff, pickDiff } from '../utils'
+import { getId, getTempId, getAnyId, diff, pickDiff, markAsClone } from '../utils'
 import fastCopy from 'fast-copy'
 import { AnyData, ModelConstructor, BaseModelAssociations, CloneOptions } from './types'
 import { Id, Params } from '@feathersjs/feathers'
@@ -11,7 +11,11 @@ export class BaseModel implements AnyData {
   static tempIdField = ''
   static associations: BaseModelAssociations = {}
 
-  public __isClone = false
+  public __isClone!: boolean
+
+  constructor() {
+    markAsClone(this, false)
+  }
 
   static instanceDefaults<C extends ModelConstructor>(this: C, data?: AnyData): AnyData {
     return data || {}
